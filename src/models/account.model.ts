@@ -3,13 +3,13 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class AccountModel {
 
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn("uuid")
     id: number;
 
     @Column()
     name: string;
 
-    @Column({ length: 12 })
+    @Column()
 	document : string;
 
     @Column('int')
