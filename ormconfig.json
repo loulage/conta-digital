@@ -2,5 +2,5 @@
     "database": "./db.sql",
     "type": "sqlite",
     "synchronize": true,
-    "entities": ["dist/**/*.model.js"]
+    "entities": ["dist/**/*.entity.js"]
 }

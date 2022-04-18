@@ -1,28 +1,28 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { TransactionModel } from "src/models/transaction.model";
-import { TransactionService } from "src/services/transaction.service";
-import { TransactionValidation } from "src/validations/transaction.validation";
+import { TransactionEntity } from "src/transactions/entities/transaction.entity";
+import { TransactionService } from "src/transactions/services/transaction.service";
+import { TransactionValidation } from "src/transactions/validations/transaction.validation";
 import { Repository } from "typeorm";
 
 @Controller('/transaction')
 export class TransactionController {
-    constructor(@InjectRepository(TransactionModel) private model: Repository<TransactionModel>, private service: TransactionService) { }
+    constructor(@InjectRepository(TransactionEntity) private model: Repository<TransactionEntity>, private service: TransactionService) { }
 
     @Get()
-    public async getAll(): Promise<TransactionModel[]> {
+    public async getAll(): Promise<TransactionEntity[]> {
         const list = await this.service.getAll();
         return list;
     }
 
     @Get(':id')
-    public async getOne(@Param('id', ParseIntPipe) id: number): Promise<TransactionModel> {
+    public async getOne(@Param('id', ParseIntPipe) id: number): Promise<TransactionEntity> {
         const account = await this.service.getOne(id);
         return account;
     }
 
     @Post()
-    public async create(@Body() body: TransactionValidation): Promise<TransactionModel> {
+    public async create(@Body() body: TransactionValidation): Promise<TransactionEntity> {
         const accountCreated = await this.service.create(body)
         return accountCreated
     } 
@@ -31,7 +31,7 @@ export class TransactionController {
     public async update(
         @Param('id', ParseIntPipe) id: number,
         @Body() body: TransactionValidation,
-    ): Promise<TransactionModel> {
+    ): Promise<TransactionEntity> {
         return await this.service.update(id, body);
 
     }

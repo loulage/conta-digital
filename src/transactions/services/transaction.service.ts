@@ -1,18 +1,18 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { TransactionModel } from "src/models/transaction.model";
+import { TransactionEntity } from "src/transactions/entities/transaction.entity";
 import { Repository } from "typeorm";
 
 @Injectable()
 export class TransactionService {
-    constructor(@InjectRepository(TransactionModel) private model: Repository<TransactionModel>) {}
+    constructor(@InjectRepository(TransactionEntity) private model: Repository<TransactionEntity>) {}
 
-    async getAll(): Promise<TransactionModel[]> {
+    async getAll(): Promise<TransactionEntity[]> {
         const list = await this.model.find();
         return list;
     }
 
-    async getOne(id) : Promise<TransactionModel> {
+    async getOne(id) : Promise<TransactionEntity> {
         const transaction = await this.model.findOne({ where: { id } });
 
         if (!transaction) {
@@ -20,13 +20,27 @@ export class TransactionService {
         }
         return transaction;
     }
+    // CREATE
+    // Service
+    // c1 = accountRepository.getAccount(cpf)
+    // c2 = accountRepository.getAccount(cpf)
+    // Operação:
+    // c1.amount = c1.amount - 100
+    // c2.amount = c2.amount + 100
+    // accounts = [c1, c2]
 
-    async create(body): Promise<TransactionModel> {
+    // Repository (DAO)
+    // await getManager().transaction(async transactionEntityManager => { await transactionalEntityManager.save(accounts)})
+
+    // Refactor: utilizar transaction
+    async create(body): Promise<TransactionEntity> {
         const transactionCreated = await this.model.save(body)
         return transactionCreated
     } 
 
-    async update(id, body): Promise<TransactionModel> {
+
+
+    async update(id, body): Promise<TransactionEntity> {
         const transaction = await this.model.findOne({ where: { id } });
 
         if (!transaction) {
