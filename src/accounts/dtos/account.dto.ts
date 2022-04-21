@@ -1,6 +1,12 @@
+import { IsNotEmpty, IsNumber } from "class-validator";
+
 export class AccountDto {
-    //quando usar readonly e writeonly?
+    @IsNotEmpty()
     name: string;
+
+    @IsNotEmpty()
     document: string;
+
+    @IsNumber()
     avaliableLimit: number;
 }

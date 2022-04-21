@@ -1,25 +1,18 @@
-import { ConflictException, Injectable, NotFoundException} from "@nestjs/common";
+import { ConflictException, Inject, Injectable, NotFoundException} from "@nestjs/common";
 import { AccountEntity } from "src/accounts/entities/account.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { AccountRepository } from "../repositories/account.repository";
+import { IAccountService } from "../interfaces/IAccountService.interface";
+import { DIToken } from "src/common/enums/DItokens";
+import { IAccountDAO } from "../interfaces/IAccountDAO";
 
 @Injectable()
-export class AccountService {
-    constructor(@InjectRepository(AccountEntity) private repository: AccountRepository) {}
+export class AccountServiceImpl implements IAccountService {
+    //Mudar o nome de repository para DAO data access object
+
+    constructor(@Inject(DIToken.AccountsDao) private repository: IAccountDAO) {}
 
     async getAll(): Promise<AccountEntity[]> {
         const list = await this.repository.getAll();
         return list;
-    }
-
-    async getOne(id) : Promise<AccountEntity> {
-        const account = await this.repository.getOne(id);
-
-        if (!account) {
-            throw new NotFoundException(`There is no account with id = ${id}`)
-        }
-        return account;
     }
 
     async findAccountByDocument(document) : Promise<AccountEntity> {
@@ -27,15 +20,19 @@ export class AccountService {
         return account;
     }
 
+    //tipar o body
     async createAccount(body): Promise<AccountEntity> {
         //verificar se o cpf já foi utilizado (conta já criada)
         const { name, document, avaliableLimit } = body
+
+        //Mudar o nome da variavel 'dedup' (evitar duplicaocao)
         const searchIfAccountExists = await this.findAccountByDocument(document);
         if (searchIfAccountExists) {
             throw new ConflictException(`There is already an account associated with document number : ${document}`)
         }
         //verificar os se os dados são válidos / não brancos
         const accountCreated = await this.repository.create(body)
+        // return direto
         return accountCreated
     } 
 
@@ -50,7 +47,7 @@ export class AccountService {
     }
 
     async delete(id): Promise<string> {
-        const account = await this.repository.delete(id);
-        return account;
+        await this.repository.delete(id);
+        return `account with id ${id} is deleted`;
     }
 }

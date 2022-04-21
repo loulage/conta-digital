@@ -1,4 +1,4 @@
-import { IsInt, IsString, Length} from "class-validator";
+import { IsInt, IsNumber, IsString, Length} from "class-validator";
 
 export class AccountValidation {
     @IsString()
@@ -9,6 +9,7 @@ export class AccountValidation {
     @Length(14, 14)
     document: string;
 
-    @IsInt()
+    // ISINT para dinheiro nao.
+    @IsNumber()
     avaliableLimit: number;
 }

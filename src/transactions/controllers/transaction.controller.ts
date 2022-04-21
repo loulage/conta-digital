@@ -1,13 +1,12 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
+import { DIToken } from "src/common/enums/DItokens";
 import { TransactionEntity } from "src/transactions/entities/transaction.entity";
-import { TransactionService } from "src/transactions/services/transaction.service";
 import { TransactionValidation } from "src/transactions/validations/transaction.validation";
-import { Repository } from "typeorm";
+import { ITransactionService } from "../interfaces/ITransactionService.interface";
 
 @Controller('/transaction')
 export class TransactionController {
-    constructor(@InjectRepository(TransactionEntity) private model: Repository<TransactionEntity>, private service: TransactionService) { }
+    constructor(@Inject(DIToken.TransactionService) private service: ITransactionService ) { }
 
     @Get()
     public async getAll(): Promise<TransactionEntity[]> {
@@ -15,11 +14,6 @@ export class TransactionController {
         return list;
     }
 
-    @Get(':id')
-    public async getOne(@Param('id', ParseIntPipe) id: number): Promise<TransactionEntity> {
-        const account = await this.service.getOne(id);
-        return account;
-    }
 
     @Post()
     public async create(@Body() body: TransactionValidation): Promise<TransactionEntity> {

@@ -3,8 +3,8 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeor
 @Entity()
 export class TransactionEntity {
 
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column()
     senderDocument: string;
@@ -16,5 +16,5 @@ export class TransactionEntity {
 	value: number;
 
     @CreateDateColumn()
-    datetime: Date;
+    dateTime: string;
 }
