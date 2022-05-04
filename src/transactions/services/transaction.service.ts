@@ -1,61 +1,70 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { send } from "process";
+import { IAccountDAO } from "src/accounts/interfaces/IAccountDAO";
+import { IAccountService } from "src/accounts/interfaces/IAccountService.interface";
 import { DIToken } from "src/common/enums/DItokens";
+import { DateHandle } from "src/common/utils/dateHandle";
 import { TransactionEntity } from "src/transactions/entities/transaction.entity";
+import { ITransferLog } from "src/transfers/interfaces/ITransferLog.interface";
+import { ITransferRepository } from "src/transfers/interfaces/ITransferRepository.interface";
+import { TransactionDto } from "../dtos/transaction.dto";
 import { ITransactionDao } from "../interfaces/ITransactionDao.interface";
 import { ITransactionService } from "../interfaces/ITransactionService.interface";
+import { TransactionValidation } from "../validations/transaction.validation";
 
 @Injectable()
 export class TransactionService implements ITransactionService {
-    constructor(@Inject(DIToken.TransactionDao) private dao: ITransactionDao) {}
+    constructor(
+        @Inject(DIToken.TransactionDao) private transactionDao: ITransactionDao,
+        @Inject(DIToken.AccountService) private accountService: IAccountService,
+        @Inject(DIToken.TransferDao) private transferDao: ITransferRepository,
+        @Inject(DIToken.TransactionValidation) private transactionValidation: TransactionValidation
+        ){}
 
-    async getAll(): Promise<TransactionEntity[]> {
-        const list = await this.dao.getAll();
-        return list;
+    async getOne(id): Promise<TransactionEntity> {
+        return await this.transactionDao.getOne(id);
+        
     }
 
-    // CREATE
-    // Service
-    // c1 = accountdao.getAccount(cpf)
-    // c2 = accountdao.getAccount(cpf)
-    // Operação:
-    // c1.amount = c1.amount - 100
-    // c2.amount = c2.amount + 100
-    // accounts = [c1, c2]
+    async getAll(): Promise<TransactionEntity[]> {
+        return await this.transactionDao.getAll();
+    }
 
-    // dao (DAO)
-    // await getManager().transaction(async transactionEntityManager => { await transactionalEntityManager.save(accounts)})
+    // Duvida sobre o retrono da função create do service de transaction
+    async create(transaction: TransactionDto): Promise<ITransferLog> {
+        const cleanedTransaction = transaction //Implementar função de limpeza
+        const senderAccount = await this.accountService.getByDocumentOrDie(cleanedTransaction.senderDocument)
+        const receiverAccount = await this.accountService.getByDocumentOrDie(cleanedTransaction.receiverDocument)
+        const timeStamp = DateHandle.timeStamp()
 
-    // Refactor: utilizar transaction
-    async create(body): Promise<TransactionEntity> {
-        //1.Conta não inicializada: não existe uma conta associada ao documento presente na operação;
-        //2. Limite insuficiente: o limite disponível para o emissor é menor que o valor da transação;
-        //3. Transação duplicada: uma transação de igual valor, igual emissor e igual receptor ocorreu nos 2 minutos anteriores à transação atual.
-        const transactionCreated = await this.dao.create(body)
-        return transactionCreated
+        this.transactionValidation.checkAvaliableLimit(senderAccount.avaliableLimit, cleanedTransaction.value)
+        await this.transactionValidation.checkTransferDedup(cleanedTransaction, timeStamp)
+        
+        
+        return await this.transferDao.executeTransfer(senderAccount, receiverAccount, cleanedTransaction.value, timeStamp)
     } 
 
 
 
-    async update(id, body): Promise<TransactionEntity> {
-        const transaction = await this.dao.getOne({ where: { id } });
+    async update(id: number, body): Promise<TransactionEntity> {
+        const transaction = await this.transactionDao.getOne({ where: { id } });
 
         if (!transaction) {
             throw new NotFoundException(`There is no transaction with id = ${id}`)
         }
-        await this.dao.update({ id }, body)
+        await this.transactionDao.update(id, body)
         // refatorar
-        return await this.dao.getOne({ where: { id } });
+        return await this.transactionDao.getOne({ where: { id } });
     }
 
     async delete(id): Promise<string> {
-        const transaction = await this.dao.getOne({ where: { id } });
+        const transaction = await this.transactionDao.getOne({ where: { id } });
 
         if (!transaction) {
             throw new NotFoundException(`There is no account with id = ${id}`)
         }
 
-        await this.dao.delete(id);
+        await this.transactionDao.delete(id);
         return `A pessoa com id ${id} foi deletada com sucesso`;
     }
 }

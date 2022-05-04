@@ -23,7 +23,7 @@ export class AccountRepositoryImpl implements IAccountDAO {
         return account;
     }
 
-    async getOneByDocument(document) : Promise<AccountEntity> {
+    async getByDocumentOrDie(document) : Promise<AccountEntity> {
         const account = await this.repository.findOne( {where: { document }});
         if (!account) {
             throw new NotFoundException(`There is no account with document number: ${document}`)
@@ -42,12 +42,14 @@ export class AccountRepositoryImpl implements IAccountDAO {
         return await this.repository.findOne({ where: { id } });
     }
 
+    // retornar conta atualizada
     async subtractAvaliableLimit(id: number, value: number) {
         const senderAccount = await this.repository.findOne({where: { id }});
 
         await this.repository.update(id, {
             avaliableLimit:  senderAccount.avaliableLimit - value
         })
+
     }
 
     async addAvaliableLimit(id: number, value: number) {

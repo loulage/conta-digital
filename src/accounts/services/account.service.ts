@@ -1,8 +1,9 @@
-import { ConflictException, Inject, Injectable, NotFoundException} from "@nestjs/common";
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException} from "@nestjs/common";
 import { AccountEntity } from "src/accounts/entities/account.entity";
 import { IAccountService } from "../interfaces/IAccountService.interface";
 import { DIToken } from "src/common/enums/DItokens";
 import { IAccountDAO } from "../interfaces/IAccountDAO";
+import { AccountDto } from "../dtos/account.dto";
 
 @Injectable()
 export class AccountServiceImpl implements IAccountService {
@@ -15,25 +16,30 @@ export class AccountServiceImpl implements IAccountService {
         return list;
     }
 
-    async findAccountByDocument(document) : Promise<AccountEntity> {
-        const account = await this.repository.getOneByDocument(document)
+    async findAccountByDocument(document: string) : Promise<AccountEntity> {
+        const account = await this.repository.getByDocumentOrDie(document)
         return account;
     }
 
-    //tipar o body
-    async createAccount(body): Promise<AccountEntity> {
-        //verificar se o cpf já foi utilizado (conta já criada)
-        const { name, document, avaliableLimit } = body
+    async getByDocumentOrDie(document: string): Promise<AccountEntity> {
+        const account = await this.repository.getByDocumentOrDie(document);
+        if (!account) {
+          throw new BadRequestException(
+            'Document not registred. Please check this information and try again',
+          );
+        }
+    
+        return account;
+      }
+    async createAccount(accountDto: AccountDto): Promise<AccountEntity> {
+        const { document } = accountDto
 
-        //Mudar o nome da variavel 'dedup' (evitar duplicaocao)
-        const searchIfAccountExists = await this.findAccountByDocument(document);
-        if (searchIfAccountExists) {
+        //utlizar o metodo dto
+        const accountDedup = await this.findAccountByDocument(document);
+        if (accountDedup) {
             throw new ConflictException(`There is already an account associated with document number : ${document}`)
         }
-        //verificar os se os dados são válidos / não brancos
-        const accountCreated = await this.repository.create(body)
-        // return direto
-        return accountCreated
+        return await this.repository.create(accountDto)
     } 
 
     async update(id, body): Promise<AccountEntity> {

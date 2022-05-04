@@ -14,6 +14,8 @@ import { AccountRepositoryImpl } from "../repositories/account.repository";
 @Module({
     imports: [TypeOrmModule.forFeature([AccountEntity])],
     controllers: [AccountControllerImpl],
-    providers: [{ provide: DIToken.AccountsDao, useClass: AccountRepositoryImpl}, {provide: DIToken.AccountService, useClass: AccountServiceImpl}]
+    providers: [{ provide: DIToken.AccountsDao, useClass: AccountRepositoryImpl}, {provide: DIToken.AccountService, useClass: AccountServiceImpl}],
+    exports: [    { provide: DIToken.AccountService, useClass: AccountServiceImpl },
+        { provide: DIToken.AccountsDao, useClass: AccountRepositoryImpl },]
 })
 export class AccountModule {}

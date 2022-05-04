@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber } from "class-validator";
+import { IsNotEmpty, IsNumber, IsPositive } from "class-validator";
 
 export class AccountDto {
     @IsNotEmpty()
@@ -8,5 +8,7 @@ export class AccountDto {
     document: string;
 
     @IsNumber()
+    @IsNotEmpty()
+    @IsPositive()
     avaliableLimit: number;
 }

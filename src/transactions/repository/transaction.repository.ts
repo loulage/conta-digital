@@ -47,7 +47,21 @@ export class TransactionDaoImpl implements ITransactionDao {
         return transactionCreated
     } 
 
-
+    async getMatchingTransfers(
+        senderDoc: string,
+        receiverDoc: string,
+        transferValue: number,
+      ) {
+        const getMatchingTransfers = await this.repository.find({
+          where: {
+            senderDocument: senderDoc,
+            receiverDocument: receiverDoc,
+            value: transferValue,
+          },
+        });
+    
+        return getMatchingTransfers;
+      }
 
     async update(id, body): Promise<TransactionEntity> {
         const transaction = await this.repository.findOne({ where: { id } });

@@ -1,6 +1,6 @@
 {
-    "database": "./db.sql",
-    "type": "sqlite",
+    "database": "desafio",
+    "type": "postgres",
     "synchronize": true,
     "entities": ["dist/**/*.entity.js"]
 }
