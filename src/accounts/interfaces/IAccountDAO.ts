@@ -4,6 +4,7 @@ import { AccountEntity } from "../entities/account.entity";
 
 export interface IAccountDAO {
     getAll(): Promise<AccountEntity[]>;
+    getOneByDocument(document: string): Promise<AccountEntity>
     getByDocumentOrDie(document: string): Promise<AccountEntity>
     create(account: AccountDto): Promise<AccountEntity>;
     update(id: number, account: AccountDto): Promise<AccountEntity>;

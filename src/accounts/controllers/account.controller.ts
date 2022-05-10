@@ -22,8 +22,9 @@ export class AccountControllerImpl {
     }
 
     @Post()
-    // Body: accountvalidation -> mudar o nome para dto / request
+
     public async create(@Body() body: AccountDto): Promise<AccountEntity> {
+        console.log(body, 'body')
         return await this.service.createAccount(body)
     } 
 

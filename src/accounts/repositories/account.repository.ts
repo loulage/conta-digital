@@ -18,8 +18,8 @@ export class AccountRepositoryImpl implements IAccountDAO {
         return list;
     }
 
-    async getOne(id) : Promise<AccountEntity> {
-        const account = await this.repository.findOne({ where: { id } });
+    async getOneByDocument(document) : Promise<AccountEntity> {
+        const account = await this.repository.findOne({ where: { document } });
         return account;
     }
 

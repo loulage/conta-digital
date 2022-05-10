@@ -17,7 +17,7 @@ export class AccountServiceImpl implements IAccountService {
     }
 
     async findAccountByDocument(document: string) : Promise<AccountEntity> {
-        const account = await this.repository.getByDocumentOrDie(document)
+        const account = await this.repository.getOneByDocument(document)
         return account;
     }
 
@@ -34,7 +34,6 @@ export class AccountServiceImpl implements IAccountService {
     async createAccount(accountDto: AccountDto): Promise<AccountEntity> {
         const { document } = accountDto
 
-        //utlizar o metodo dto
         const accountDedup = await this.findAccountByDocument(document);
         if (accountDedup) {
             throw new ConflictException(`There is already an account associated with document number : ${document}`)

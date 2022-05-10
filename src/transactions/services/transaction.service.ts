@@ -30,7 +30,7 @@ export class TransactionService implements ITransactionService {
         return await this.transactionDao.getAll();
     }
 
-    // Duvida sobre o retrono da função create do service de transaction
+ 
     async create(transaction: TransactionDto): Promise<ITransferLog> {
         const cleanedTransaction = transaction //Implementar função de limpeza
         const senderAccount = await this.accountService.getByDocumentOrDie(cleanedTransaction.senderDocument)
