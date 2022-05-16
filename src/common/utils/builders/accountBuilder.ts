@@ -1,6 +1,6 @@
 import { AccountEntity } from 'src/accounts/entities/account.entity';
 
-export class AccountsBuilder {
+export class AccountBuilder {
   static buildAccounts(name: string, document: string, id?: number): AccountEntity {
     return <AccountEntity>{
       id: id,

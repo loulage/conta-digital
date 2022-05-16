@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException} from "@nestjs/common";
-import { AccountEntity } from "src/accounts/entities/account.entity";
+import { AccountEntity } from "../../accounts/entities/account.entity";
 import { IAccountService } from "../interfaces/IAccountService.interface";
-import { DIToken } from "src/common/enums/DItokens";
+import { DIToken } from "../../common/enums/DItokens";
 import { IAccountDAO } from "../interfaces/IAccountDAO";
 import { AccountDto } from "../dtos/account.dto";
 
@@ -25,10 +25,9 @@ export class AccountServiceImpl implements IAccountService {
         const account = await this.repository.getByDocumentOrDie(document);
         if (!account) {
           throw new BadRequestException(
-            'Document not registred. Please check this information and try again',
+            'Document not registered. Please check this information and try again',
           );
         }
-    
         return account;
       }
     async createAccount(accountDto: AccountDto): Promise<AccountEntity> {
@@ -36,7 +35,7 @@ export class AccountServiceImpl implements IAccountService {
 
         const accountDedup = await this.findAccountByDocument(document);
         if (accountDedup) {
-            throw new ConflictException(`There is already an account associated with document number : ${document}`)
+            throw new ConflictException(`Document already registered. Failed to create account`)
         }
         return await this.repository.create(accountDto)
     } 

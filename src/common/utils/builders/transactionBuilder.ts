@@ -1,7 +1,5 @@
 import { TransactionEntity } from "src/transactions/entities/transaction.entity";
 
-  
-
 export class TransfersEntityBuilder {
   static buildTransfers(id?: number, dateTime?: string): TransactionEntity {
     return <TransactionEntity>{

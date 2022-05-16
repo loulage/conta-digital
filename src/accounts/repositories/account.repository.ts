@@ -18,12 +18,13 @@ export class AccountRepositoryImpl implements IAccountDAO {
         return list;
     }
 
-    async getOneByDocument(document) : Promise<AccountEntity> {
+    async getOneByDocument(document: string) : Promise<AccountEntity> {
+
         const account = await this.repository.findOne({ where: { document } });
         return account;
     }
 
-    async getByDocumentOrDie(document) : Promise<AccountEntity> {
+    async getByDocumentOrDie(document: string) : Promise<AccountEntity> {
         const account = await this.repository.findOne( {where: { document }});
         if (!account) {
             throw new NotFoundException(`There is no account with document number: ${document}`)

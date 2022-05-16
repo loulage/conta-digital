@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, NotFoundException, Inject } from "@nestjs/common";
 import { AccountEntity } from "src/accounts/entities/account.entity";
-import { DIToken } from "src/common/enums/DItokens";
+import { DIToken } from "../../common/enums/DItokens";
 import { AccountDto } from "../dtos/account.dto";
 import { IAccountService } from "../interfaces/IAccountService.interface";
 
@@ -24,7 +24,6 @@ export class AccountControllerImpl {
     @Post()
 
     public async create(@Body() body: AccountDto): Promise<AccountEntity> {
-        console.log(body, 'body')
         return await this.service.createAccount(body)
     } 
 
@@ -34,7 +33,6 @@ export class AccountControllerImpl {
         @Body() body: AccountDto,
     ): Promise<AccountEntity> {
         return await this.service.update(id, body);
-
     }
 
     @Delete(':id')

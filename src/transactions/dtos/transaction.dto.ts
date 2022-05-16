@@ -11,5 +11,5 @@ export class TransactionDto {
     receiverDocument : string;
 
     @IsNumber()
-    value: number;
+    value: number;  
 }
